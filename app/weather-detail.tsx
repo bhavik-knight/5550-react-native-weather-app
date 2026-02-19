@@ -2,7 +2,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import axios from 'axios';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function WeatherDetailScreen() {
     const { city } = useLocalSearchParams<{ city: string }>();
@@ -131,11 +131,20 @@ const styles = StyleSheet.create({
         borderRadius: 25,
         padding: 30,
         alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 12,
-        elevation: 5,
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.1,
+                shadowRadius: 12,
+            },
+            android: {
+                elevation: 5,
+            },
+            web: {
+                boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+            }
+        }),
     },
     temp: {
         fontSize: 72,

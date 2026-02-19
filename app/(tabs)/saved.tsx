@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useFocusEffect, useRouter } from 'expo-router';
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useDatabase } from '../../hooks/useDatabase';
 import { LocationData } from '../../types/weather';
@@ -17,7 +17,6 @@ export default function SavedScreen() {
     const router = useRouter();
 
     const loadSavedCities = useCallback(async () => {
-        if (refreshing) return;
         setRefreshing(true);
         try {
             const saved = await getLocations();
@@ -27,7 +26,7 @@ export default function SavedScreen() {
             }));
             setCities(citiesWithWeather);
 
-            const weatherPromises = citiesWithWeather.map(async (city) => {
+            const updatedCities = await Promise.all(citiesWithWeather.map(async (city) => {
                 try {
                     const geoRes = await axios.get(`https://geocoding-api.open-meteo.com/v1/search?name=${city.city_name}&count=1&language=en&format=json`);
                     const geoData = geoRes.data;
@@ -35,28 +34,21 @@ export default function SavedScreen() {
                     if (geoData.results && geoData.results.length > 0) {
                         const { latitude, longitude } = geoData.results[0];
                         const weatherRes = await axios.get(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m`);
-                        const weatherData = weatherRes.data;
-
-                        setCities(prev => prev.map(c =>
-                            c.id === city.id
-                                ? { ...c, temp: weatherData.current.temperature_2m, loading: false }
-                                : c
-                        ));
-                    } else {
-                        setCities(prev => prev.map(c => c.id === city.id ? { ...c, loading: false } : c));
+                        return { ...city, temp: weatherRes.data.current.temperature_2m, loading: false };
                     }
+                    return { ...city, loading: false };
                 } catch (error) {
-                    setCities(prev => prev.map(c => c.id === city.id ? { ...c, loading: false } : c));
+                    return { ...city, loading: false };
                 }
-            });
+            }));
 
-            await Promise.all(weatherPromises);
+            setCities(updatedCities);
         } catch (error) {
             console.error("Error loading saved cities:", error);
         } finally {
             setRefreshing(false);
         }
-    }, [getLocations, refreshing]);
+    }, [getLocations]);
 
     useFocusEffect(
         useCallback(() => {
