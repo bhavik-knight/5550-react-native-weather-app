@@ -67,5 +67,27 @@ pids
 # vscode
 .vscode/
 
-# andriod-studio
+# android-studio / intellij
 .idea/
+*.iml
+*.iws
+
+# other ides
+.classpath
+.project
+.settings/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*~
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+Network Trash Folder
+Temporary Items
+.apdisk
