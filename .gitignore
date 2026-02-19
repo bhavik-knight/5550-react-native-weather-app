@@ -57,3 +57,15 @@ pids
 *.pid
 *.seed
 *.pid.lock
+
+# SQLite database
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+
+# vscode
+.vscode/
+
+# andriod-studio
+.idea/
