@@ -53,7 +53,6 @@ export const useDatabase = () => {
 
     const removeLocation = useCallback(async (id: number): Promise<boolean> => {
         try {
-            console.log("DB - Removing location with ID:", id);
             await db.runAsync('DELETE FROM locations WHERE id = ?', id);
             return true;
         } catch (error) {

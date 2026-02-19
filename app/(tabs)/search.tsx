@@ -1,5 +1,6 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import { useFocusEffect } from 'expo-router';
+import React, { useCallback, useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useDatabase } from '../../hooks/useDatabase';
 import { GeocodingResponse, GeocodingResult } from '../../types/weather';
@@ -13,23 +14,33 @@ export default function SearchScreen() {
     const [saveDisabled, setSaveDisabled] = useState(false);
     const { addLocation, getCount } = useDatabase();
 
-    useEffect(() => {
-        checkSaveLimit();
-    }, []);
-
-    const checkSaveLimit = async () => {
+    const checkSaveLimit = useCallback(async () => {
         const count = await getCount();
         setSaveDisabled(count >= 5);
-    };
+    }, [getCount]);
+
+    const resetSearch = useCallback(() => {
+        setSearch('');
+        setResults([]);
+        setSelectedCity(null);
+        setWeather(null);
+    }, []);
+
+    useFocusEffect(
+        useCallback(() => {
+            checkSaveLimit();
+            resetSearch();
+        }, [checkSaveLimit, resetSearch])
+    );
 
     const handleSearch = async () => {
         if (!search.trim()) return;
         setLoading(true);
+        setSelectedCity(null);
+        setWeather(null);
         try {
             const response = await axios.get<GeocodingResponse>(`https://geocoding-api.open-meteo.com/v1/search?name=${search}&count=5&language=en&format=json`);
             setResults(response.data.results || []);
-            setSelectedCity(null);
-            setWeather(null);
         } catch (error) {
             Alert.alert("Error", "Geocoding failed");
         } finally {
@@ -66,6 +77,7 @@ export default function SearchScreen() {
         if (success) {
             Alert.alert("Success", `${selectedCity.name} saved!`);
             checkSaveLimit();
+            resetSearch();
         } else {
             Alert.alert("Error", "Could not save city (maybe it's already saved).");
         }

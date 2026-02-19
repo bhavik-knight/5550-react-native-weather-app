@@ -1,8 +1,0 @@
-  --non-interactive is not supported, use $CI=1 instead
-Starting project at /home/bhavik/Dropbox/edu/smu/winter/mobile_dev/rn_assignment_weather
-› Port 8081 is running this app in another window
-  /home/bhavik/Dropbox/edu/smu/winter/mobile_dev/rn_assignment_weather (pid 78033)
-Input is required, but 'npx expo' is in non-interactive mode.
-Required input:
-> Use port 8082 instead?
-› Skipping dev server
