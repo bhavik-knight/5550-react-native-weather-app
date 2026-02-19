@@ -1,7 +1,8 @@
+import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useDatabase } from '../../hooks/useDatabase';
 import { LocationData } from '../../types/weather';
 
@@ -57,21 +58,33 @@ export default function SavedScreen() {
     );
 
     const handleDelete = async (id: number, name: string) => {
+        const performDelete = async () => {
+            try {
+                const success = await removeLocation(id);
+                if (success) {
+                    setCities(prev => prev.filter(c => c.id !== id));
+                } else {
+                    Alert.alert("Error", "Could not remove location. Please try again.");
+                }
+            } catch (error) {
+                console.error("Delete error:", error);
+                Alert.alert("Error", "An unexpected error occurred.");
+            }
+        };
+
+        if (Platform.OS === 'web') {
+            if (window.confirm(`Are you sure you want to remove ${name}?`)) {
+                await performDelete();
+            }
+            return;
+        }
+
         Alert.alert(
             "Delete Location",
             `Are you sure you want to remove ${name}?`,
             [
                 { text: "Cancel", style: "cancel" },
-                {
-                    text: "Delete",
-                    style: "destructive",
-                    onPress: async () => {
-                        const success = await removeLocation(id);
-                        if (success) {
-                            setCities(prev => prev.filter(c => c.id !== id));
-                        }
-                    }
-                }
+                { text: "Delete", style: "destructive", onPress: performDelete }
             ]
         );
     };
@@ -106,8 +119,9 @@ export default function SavedScreen() {
                         <TouchableOpacity
                             style={styles.deleteButton}
                             onPress={() => handleDelete(item.id, item.city_name)}
+                            activeOpacity={0.7}
                         >
-                            <Text style={styles.deleteButtonText}>Delete</Text>
+                            <Ionicons name="trash-outline" size={20} color="#fff" />
                         </TouchableOpacity>
                     </View>
                 )}
@@ -155,13 +169,25 @@ const styles = StyleSheet.create({
     },
     deleteButton: {
         backgroundColor: '#FF3B30',
-        paddingVertical: 8,
-        paddingHorizontal: 15,
-        borderRadius: 8,
-    },
-    deleteButtonText: {
-        color: '#fff',
-        fontWeight: 'bold',
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.2,
+                shadowRadius: 4,
+            },
+            android: {
+                elevation: 3,
+            },
+            web: {
+                boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.2)',
+            }
+        }),
     },
     emptyState: {
         flex: 1,
