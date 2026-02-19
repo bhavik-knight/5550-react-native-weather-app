@@ -1,6 +1,9 @@
 # Weather App (React Native)
 
-![Weather App Demo](/home/bhavik/Dropbox/edu/smu/winter/mobile_dev/rn_assignment_weather/demo_weatherapp.mp4)
+<video width="640" height="480" controls>
+  <source src="./demo_weatherapp.mp4" type="video/mp4">
+  Weather App Demo
+</video>
 
 A robust weather application built with React Native and Expo, featuring real-time weather data, city search, and local persistence.
 
