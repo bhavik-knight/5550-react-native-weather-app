@@ -1,7 +1,6 @@
 # Weather App (React Native)
 
-<video src="./demo_weatherapp.mp4" controls="controls" style="max-width: 100%;">
-</video>
+![WeatherApp Demo](./demo_weatherapp.gif)
 
 A robust weather application built with React Native and Expo, featuring real-time weather data, city search, and local persistence.
 
