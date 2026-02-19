@@ -2,7 +2,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import axios from 'axios';
 import * as Location from 'expo-location';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 export default function CurrentWeatherScreen() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
@@ -11,11 +11,7 @@ export default function CurrentWeatherScreen() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
-    if (Platform.OS !== 'web') {
-      getLocation();
-    } else {
-      setLoading(false);
-    }
+    getLocation();
   }, []);
 
   const getLocation = async () => {
@@ -65,23 +61,6 @@ export default function CurrentWeatherScreen() {
       <View style={styles.center}>
         <FontAwesome name="exclamation-triangle" size={50} color="#FF3B30" />
         <Text style={styles.error}>{errorMsg}</Text>
-        {Platform.OS === 'web' && (
-          <TouchableOpacity style={styles.button} onPress={getLocation}>
-            <Text style={styles.buttonText}>Try Again</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-    );
-  }
-
-  if (Platform.OS === 'web' && !location && !weather) {
-    return (
-      <View style={styles.center}>
-        <FontAwesome name="map-marker" size={50} color="#007AFF" />
-        <Text style={styles.loadingText}>Location access required on Web</Text>
-        <TouchableOpacity style={styles.button} onPress={getLocation}>
-          <Text style={styles.buttonText}>Get Current Weather</Text>
-        </TouchableOpacity>
       </View>
     );
   }
@@ -165,9 +144,6 @@ const styles = StyleSheet.create({
       android: {
         elevation: 5,
       },
-      web: {
-        boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
-      }
     }),
   },
   temp: {

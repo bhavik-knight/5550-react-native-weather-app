@@ -72,13 +72,6 @@ export default function SavedScreen() {
             }
         };
 
-        if (Platform.OS === 'web') {
-            if (window.confirm(`Are you sure you want to remove ${name}?`)) {
-                await performDelete();
-            }
-            return;
-        }
-
         Alert.alert(
             "Delete Location",
             `Are you sure you want to remove ${name}?`,
